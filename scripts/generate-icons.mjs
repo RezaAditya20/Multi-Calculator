@@ -108,14 +108,24 @@ function lerp(a, b, t) {
   return a + (b - a) * t;
 }
 
+function mix(from, to, t) {
+  return [
+    Math.round(lerp(from[0], to[0], t)),
+    Math.round(lerp(from[1], to[1], t)),
+    Math.round(lerp(from[2], to[2], t)),
+  ];
+}
+
+/* Black surface with a blue accent, matching the app theme. */
+const BG_FROM = [0x1c, 0x1c, 0x20];
+const BG_TO = [0x05, 0x05, 0x06];
+const DROP_FROM = [0x60, 0xa5, 0xfa];
+const DROP_TO = [0x25, 0x63, 0xeb];
+
 /** Returns a premultiplied RGBA color at a normalized position. */
 function colorAt(px, py, { fullBleed }) {
   const t = Math.min(1, Math.max(0, (px + py) / 2));
-  const bg = [
-    Math.round(lerp(0x3b, 0x1d, t)),
-    Math.round(lerp(0x82, 0x4e, t)),
-    Math.round(lerp(0xf6, 0xd8, t)),
-  ];
+  const bg = mix(BG_FROM, BG_TO, t);
 
   if (!fullBleed && sdRoundRect(px, py, 0.5, 0.5, 1, 1, 0.22) > 0) {
     return [0, 0, 0, 0];
@@ -125,7 +135,8 @@ function colorAt(px, py, { fullBleed }) {
     if (inEqualsBars(px, py)) {
       return [bg[0], bg[1], bg[2], 255];
     }
-    return [255, 255, 255, 255];
+    const drop = mix(DROP_FROM, DROP_TO, t);
+    return [drop[0], drop[1], drop[2], 255];
   }
 
   return [bg[0], bg[1], bg[2], 255];

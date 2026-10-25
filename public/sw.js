@@ -3,13 +3,15 @@
 const CACHE_VERSION = "v1";
 const CACHE_NAME = `multi-calculator-${CACHE_VERSION}`;
 
+/* All URLs are relative to this worker's location, so the app works both at
+   the domain root and under a GitHub Pages sub-path (/<repo>/). */
 const PRECACHE_URLS = [
-  "/",
-  "/index.html",
-  "/manifest.webmanifest",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/apple-touch-icon.png",
+  "./",
+  "./index.html",
+  "./manifest.webmanifest",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/apple-touch-icon.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -54,7 +56,9 @@ self.addEventListener("fetch", (event) => {
         return response;
       })
       .catch(() =>
-        caches.match(request).then((cached) => cached || caches.match("/index.html")),
+        caches
+          .match(request)
+          .then((cached) => cached || caches.match("./index.html")),
       ),
   );
 });

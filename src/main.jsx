@@ -11,7 +11,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch((error) => {
+    // Resolve relative to the page URL so it works both in dev ("/") and on
+    // GitHub Pages ("https://<user>.github.io/<repo>/").
+    const swUrl = new URL("sw.js", document.baseURI);
+    navigator.serviceWorker.register(swUrl).catch((error) => {
       console.warn("Service worker registration failed:", error);
     });
   });

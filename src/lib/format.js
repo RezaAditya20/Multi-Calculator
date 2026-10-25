@@ -4,7 +4,7 @@ const intFormatter = new Intl.NumberFormat("id-ID", {
 
 const decimalFormatter = new Intl.NumberFormat("id-ID", {
   minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
+  maximumFractionDigits: 3,
 });
 
 /** Keep only digits, so the field always holds a valid whole number string. */

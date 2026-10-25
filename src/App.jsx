@@ -2,45 +2,78 @@ import { useEffect, useMemo, useState } from "react";
 import PriceRow from "./components/PriceRow.jsx";
 import { formatPerMl, pricePerMl } from "./lib/format.js";
 
-const STORAGE_KEY = "multi-calculator.prices.v1";
-const LEGACY_STORAGE_KEY = "multi-calculator.soap.v1";
+const STORAGE_KEY = "multi-calculator.tabs.v1";
+const LEGACY_KEYS = [
+  "multi-calculator.prices.v1",
+  "multi-calculator.soap.v1",
+];
 const THEME_KEY = "multi-calculator.theme";
 const SIZE_PRESETS = [50, 100, 250, 500, 800, 1000];
 
-function makeRow(price = "", ml = "") {
-  return {
-    id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
-    price,
-    ml,
-  };
+function uid() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function readRows() {
+function makeRow(price = "", ml = "") {
+  return { id: uid(), price, ml };
+}
+
+function sanitizeRows(value) {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (row) =>
+      row &&
+      typeof row.id === "string" &&
+      typeof row.price === "string" &&
+      typeof row.ml === "string",
+  );
+}
+
+function makeTab(name, rows) {
+  return { id: uid(), name, rows: rows.length ? rows : [makeRow()] };
+}
+
+function readState() {
   try {
-    let raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      // Migrate data saved under the previous key.
-      raw = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.tabs)) {
+        const tabs = parsed.tabs
+          .filter((tab) => tab && typeof tab.id === "string")
+          .map((tab) =>
+            makeTab(
+              typeof tab.name === "string" && tab.name.trim()
+                ? tab.name.trim()
+                : "Daftar",
+              sanitizeRows(tab.rows),
+            ),
+          );
+        if (tabs.length) {
+          const activeTabId = tabs.some((tab) => tab.id === parsed.activeTabId)
+            ? parsed.activeTabId
+            : tabs[0].id;
+          return { tabs, activeTabId };
+        }
+      }
     }
-    if (!raw) {
-      // Example row on first visit, so the format is obvious right away.
-      return [makeRow("10000", "100"), makeRow()];
-    }
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) {
-      const rows = parsed.filter(
-        (row) =>
-          row &&
-          typeof row.id === "string" &&
-          typeof row.price === "string" &&
-          typeof row.ml === "string",
-      );
-      if (rows.length) return rows;
+
+    // Migrate data saved by earlier versions (plain row arrays).
+    for (const key of LEGACY_KEYS) {
+      const legacy = window.localStorage.getItem(key);
+      if (!legacy) continue;
+      const rows = sanitizeRows(JSON.parse(legacy));
+      if (rows.length) {
+        const tab = makeTab("Daftar 1", rows);
+        return { tabs: [tab], activeTabId: tab.id };
+      }
     }
   } catch (error) {
-    console.warn("Could not read saved rows:", error);
+    console.warn("Could not read saved data:", error);
   }
-  return [makeRow()];
+
+  const tab = makeTab("Daftar 1", [makeRow("10000", "100"), makeRow()]);
+  return { tabs: [tab], activeTabId: tab.id };
 }
 
 function setMeta(selector, content) {
@@ -49,7 +82,9 @@ function setMeta(selector, content) {
 }
 
 export default function App() {
-  const [rows, setRows] = useState(readRows);
+  const [{ tabs, activeTabId }, setState] = useState(readState);
+  const [editingTabId, setEditingTabId] = useState(null);
+  const [draftName, setDraftName] = useState("");
   const [theme, setTheme] = useState(() => {
     try {
       return window.localStorage.getItem(THEME_KEY) || "dark";
@@ -60,11 +95,11 @@ export default function App() {
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ tabs, activeTabId }));
     } catch (error) {
-      console.warn("Could not save rows:", error);
+      console.warn("Could not save data:", error);
     }
-  }, [rows]);
+  }, [tabs, activeTabId]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -74,19 +109,18 @@ export default function App() {
       /* ignore */
     }
     const isDark = theme === "dark";
-    setMeta('meta[name="theme-color"]', isDark ? "#0f172a" : "#f1f5f9");
+    setMeta('meta[name="theme-color"]', isDark ? "#000000" : "#f1f5f9");
     setMeta(
       'meta[name="apple-mobile-web-app-status-bar-style"]',
       isDark ? "black-translucent" : "default",
     );
   }, [theme]);
 
+  const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
+  const rows = activeTab ? activeTab.rows : [];
+
   const items = useMemo(
-    () =>
-      rows.map((row) => ({
-        ...row,
-        perMl: pricePerMl(row.price, row.ml),
-      })),
+    () => rows.map((row) => ({ ...row, perMl: pricePerMl(row.price, row.ml) })),
     [rows],
   );
 
@@ -98,7 +132,8 @@ export default function App() {
   const best = useMemo(
     () =>
       validItems.reduce(
-        (current, item) => (current === null || item.perMl < current.perMl ? item : current),
+        (current, item) =>
+          current === null || item.perMl < current.perMl ? item : current,
         null,
       ),
     [validItems],
@@ -107,34 +142,96 @@ export default function App() {
   const worst = useMemo(
     () =>
       validItems.reduce(
-        (current, item) => (current === null || item.perMl > current.perMl ? item : current),
+        (current, item) =>
+          current === null || item.perMl > current.perMl ? item : current,
         null,
       ),
     [validItems],
   );
 
-  const updateRow = (id, field, value) => {
-    setRows((current) =>
-      current.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
+  /* ── Tabs ── */
+  const patchTab = (tabId, patch) => {
+    setState((current) => ({
+      ...current,
+      tabs: current.tabs.map((tab) =>
+        tab.id === tabId ? { ...tab, ...patch } : tab,
+      ),
+    }));
+  };
+
+  const switchTab = (tabId) => {
+    setEditingTabId(null);
+    setState((current) => ({ ...current, activeTabId: tabId }));
+  };
+
+  const addTab = () => {
+    const tab = makeTab(`Daftar ${tabs.length + 1}`, [makeRow()]);
+    setState((current) => ({
+      tabs: [...current.tabs, tab],
+      activeTabId: tab.id,
+    }));
+    setDraftName("");
+    setEditingTabId(tab.id);
+  };
+
+  const startRename = (tab) => {
+    setDraftName(tab.id === activeTabId ? tab.name : activeTab.name);
+    setEditingTabId(tab.id);
+  };
+
+  const commitRename = () => {
+    if (!editingTabId) return;
+    const name = draftName.trim();
+    if (name) patchTab(editingTabId, { name });
+    setEditingTabId(null);
+  };
+
+  const cancelRename = () => setEditingTabId(null);
+
+  const deleteActiveTab = () => {
+    if (tabs.length <= 1 || !activeTab) return;
+    const hasData = activeTab.rows.some(
+      (row) => pricePerMl(row.price, row.ml) !== null,
     );
+    const message = `Hapus daftar "${activeTab.name}" beserta isinya?`;
+    if (hasData && !window.confirm(message)) return;
+
+    const remaining = tabs.filter((tab) => tab.id !== activeTab.id);
+    setState({ tabs: remaining, activeTabId: remaining[0].id });
+    setEditingTabId(null);
   };
 
-  const addRow = (ml = "") => {
-    setRows((current) => [...current, makeRow("", ml ? String(ml) : "")]);
-  };
-
-  const removeRow = (id) => {
-    setRows((current) => {
-      const next = current.filter((row) => row.id !== id);
-      return next.length ? next : [makeRow()];
+  /* ── Rows ── */
+  const updateRow = (rowId, field, value) => {
+    if (!activeTab) return;
+    patchTab(activeTab.id, {
+      rows: activeTab.rows.map((row) =>
+        row.id === rowId ? { ...row, [field]: value } : row,
+      ),
     });
   };
 
+  const addRow = (ml = "") => {
+    if (!activeTab) return;
+    patchTab(activeTab.id, {
+      rows: [...activeTab.rows, makeRow("", ml ? String(ml) : "")],
+    });
+  };
+
+  const removeRow = (rowId) => {
+    if (!activeTab) return;
+    const next = activeTab.rows.filter((row) => row.id !== rowId);
+    patchTab(activeTab.id, { rows: next.length ? next : [makeRow()] });
+  };
+
   const resetRows = () => {
-    setRows([makeRow()]);
+    if (!activeTab) return;
+    patchTab(activeTab.id, { rows: [makeRow()] });
   };
 
   const comparedCount = validItems.length;
+  const bestNo = best ? items.findIndex((item) => item.id === best.id) + 1 : 0;
+  const worstNo = worst ? items.findIndex((item) => item.id === worst.id) + 1 : 0;
 
   return (
     <div className="app">
@@ -142,7 +239,7 @@ export default function App() {
         <div className="topbar-inner">
           <a
             className="brand"
-            href="/"
+            href="./"
             onClick={(event) => event.preventDefault()}
             aria-label="Beranda"
           >
@@ -187,6 +284,84 @@ export default function App() {
       </header>
 
       <main className="page">
+        <div className="tabs">
+          <div className="tabs-scroll no-scrollbar" role="tablist" aria-label="Daftar perbandingan">
+            {tabs.map((tab) => {
+              const isActive = tab.id === activeTab.id;
+              const filled = tab.rows.filter(
+                (row) => pricePerMl(row.price, row.ml) !== null,
+              ).length;
+              const isEditing = editingTabId === tab.id;
+
+              return isEditing ? (
+                <span key={tab.id} className="tab tab-editing">
+                  <input
+                    className="tab-input"
+                    value={draftName}
+                    placeholder="Nama daftar"
+                    autoFocus
+                    style={{ width: `${Math.max(draftName.length, 6) + 4}ch` }}
+                    onChange={(event) => setDraftName(event.target.value)}
+                    onBlur={commitRename}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") commitRename();
+                      if (event.key === "Escape") cancelRename();
+                    }}
+                  />
+                </span>
+              ) : (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  className={`tab${isActive ? " is-active" : ""}`}
+                  onClick={() => switchTab(tab.id)}
+                  onDoubleClick={() => startRename(tab)}
+                >
+                  <span className="tab-name">{tab.name}</span>
+                  {filled > 0 ? <span className="tab-count">{filled}</span> : null}
+                </button>
+              );
+            })}
+
+            <button
+              type="button"
+              className="tab tab-add"
+              onClick={addTab}
+              aria-label="Tambah daftar"
+            >
+              + Tambah
+            </button>
+          </div>
+
+          <div className="tabs-actions">
+            <button
+              type="button"
+              className="tab-action"
+              onClick={() => startRename(activeTab)}
+              aria-label="Ganti nama daftar aktif"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 20h4l10-10a2.8 2.8 0 0 0-4-4L4 16v4Z" />
+                <path d="M13.5 6.5l4 4" />
+              </svg>
+            </button>
+            {tabs.length > 1 ? (
+              <button
+                type="button"
+                className="tab-action"
+                onClick={deleteActiveTab}
+                aria-label="Hapus daftar aktif"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13h10l1-13" />
+                </svg>
+              </button>
+            ) : null}
+          </div>
+        </div>
+
         <section className="hero">
           <h1>
             Cek harga <span className="hero-accent">per satuan</span>
@@ -254,7 +429,11 @@ export default function App() {
           </ul>
         )}
 
-        <button type="button" className="primary-btn add-btn" onClick={() => addRow()}>
+        <button
+          type="button"
+          className="primary-btn add-btn"
+          onClick={() => addRow()}
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 5v14M5 12h14" />
           </svg>
@@ -269,7 +448,9 @@ export default function App() {
                 Rp {formatPerMl(best.perMl)}
                 <span className="summary-unit">/ml</span>
               </strong>
-              <span className="summary-hint">Paling hemat</span>
+              <span className="summary-hint">
+                #{bestNo} &middot; Rp {best.price} untuk {best.ml} ml
+              </span>
             </div>
             <div className="summary-card">
               <span className="summary-label">Termahal</span>
@@ -278,7 +459,7 @@ export default function App() {
                 <span className="summary-unit">/ml</span>
               </strong>
               <span className="summary-hint">
-                {comparedCount} harga dibandingkan
+                #{worstNo} &middot; Rp {worst.price} untuk {worst.ml} ml
               </span>
             </div>
             <div className="summary-card">
@@ -289,7 +470,7 @@ export default function App() {
               </strong>
               <span className="summary-hint">
                 {Math.round(((worst.perMl - best.perMl) / best.perMl) * 100)}%
-                lebih mahal
+                lebih mahal dari yang termurah
               </span>
             </div>
           </section>

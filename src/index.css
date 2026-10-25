@@ -1,28 +1,28 @@
 /* ── Tokens: dark (default) ── */
 :root,
 [data-theme="dark"] {
-  --bg: #0f172a;
-  --panel: #161f34;
-  --panel-soft: #1e293b;
-  --field: #0d1626;
-  --fg: #e2e8f0;
-  --fg-dim: #94a3b8;
-  --muted: #7c8ba1;
+  --bg: #000000;
+  --panel: #141416;
+  --panel-soft: #1c1c1f;
+  --field: #0a0a0b;
+  --fg: #fafafa;
+  --fg-dim: #a3a3ad;
+  --muted: #75757e;
   --primary: #3b82f6;
   --primary-strong: #2563eb;
-  --primary-soft: rgba(59, 130, 246, 0.16);
+  --primary-soft: rgba(59, 130, 246, 0.14);
   --green: #4ade80;
   --green-soft: rgba(34, 197, 94, 0.16);
   --red: #f87171;
   --red-soft: rgba(248, 113, 113, 0.14);
-  --chip: rgba(148, 163, 184, 0.12);
-  --chip-hover: rgba(148, 163, 184, 0.2);
-  --header-bg: #161f34;
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.32), 0 8px 24px rgba(0, 0, 0, 0.24);
-  --shadow-glow: 0 0 60px rgba(59, 130, 246, 0.2);
-  --shadow-header: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.28);
+  --chip: rgba(255, 255, 255, 0.08);
+  --chip-hover: rgba(255, 255, 255, 0.14);
+  --header-bg: #0b0b0c;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 60px rgba(59, 130, 246, 0.18);
+  --shadow-header: 0 1px 2px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.5);
   --focus-ring: rgba(59, 130, 246, 0.45);
-  --skeleton: rgba(148, 163, 184, 0.14);
+  --skeleton: rgba(255, 255, 255, 0.08);
 }
 
 /* ── Tokens: light ── */
@@ -242,6 +242,138 @@ ul {
   .topbar {
     padding-top: calc(env(safe-area-inset-top, 47px) + 12px);
   }
+}
+
+/* ── Tabs (daftar) ── */
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: var(--shadow-card);
+}
+
+.tabs-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 2px;
+  margin: -2px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--fg-dim);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+
+.tab:active {
+  transform: scale(0.97);
+}
+
+.tab.is-active {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tab-add {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.tab-count {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, 0.22);
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tab-editing {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.tab-input {
+  height: 34px;
+  min-width: 110px;
+  max-width: 220px;
+  padding: 0 12px;
+  border: 0;
+  outline: none;
+  border-radius: 999px;
+  background: var(--field);
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.tab-input::placeholder {
+  color: var(--muted);
+}
+
+.tabs-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.tab-action {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--chip);
+  color: var(--fg-dim);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tab-action:hover,
+.tab-action:active {
+  background: var(--chip-hover);
+  color: var(--fg);
+}
+
+.tab-action svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tab:focus-visible,
+.tab-action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 /* ── Page ── */
