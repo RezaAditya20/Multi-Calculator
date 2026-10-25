@@ -24,6 +24,10 @@
   --shadow-header: 0 1px 2px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.5);
   --focus-ring: rgba(59, 130, 246, 0.45);
   --skeleton: rgba(255, 255, 255, 0.08);
+
+  /* Motion: kurva ala iOS (ease-in-ease-out) dipakai semua transisi/animasi */
+  --ease-ios: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --dur-ios: 0.28s;
 }
 
 /* ── Tokens: light ── */
@@ -136,7 +140,7 @@ ul {
   -webkit-backdrop-filter: blur(16px);
   color: var(--fg);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  transition: transform 0.12s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .brand:active {
@@ -233,7 +237,7 @@ ul {
   border-radius: 50%;
   background: var(--chip);
   color: var(--fg-dim);
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .topbar-btn:hover,
@@ -260,7 +264,7 @@ ul {
   color: var(--fg-dim);
   font-size: 0.78rem;
   font-weight: 700;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .ghost-btn:hover,
@@ -313,7 +317,7 @@ ul {
   font-size: 0.82rem;
   font-weight: 700;
   white-space: nowrap;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .tab:active {
@@ -382,7 +386,7 @@ ul {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .tab-action:hover,
@@ -412,6 +416,19 @@ ul {
   max-width: 1100px;
   margin: 0 auto;
   padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 96px);
+  /* entrance ala iOS (sama seperti .view di project Notes) */
+  animation: view-in var(--dur-ios) var(--ease-ios);
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Hero ── */
@@ -478,7 +495,7 @@ ul {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  transition: box-shadow 0.15s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .mobile-dock-search:focus-within {
@@ -531,7 +548,7 @@ ul {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  transition: transform 0.12s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .mobile-dock-add svg {
@@ -767,7 +784,7 @@ ul {
   color: #ffffff;
   font-size: 0.85rem;
   font-weight: 700;
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .quick-btn:hover,
@@ -811,7 +828,7 @@ ul {
   border-radius: 16px;
   padding: 12px;
   box-shadow: var(--shadow-card);
-  transition: box-shadow 0.18s ease, background 0.18s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .row-card.is-best {
@@ -875,7 +892,7 @@ ul {
   background: var(--chip);
   color: var(--muted);
   flex-shrink: 0;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .icon-btn:hover,
@@ -954,7 +971,7 @@ ul {
   height: 42px;
   border-radius: 12px;
   background: var(--field);
-  transition: box-shadow 0.15s ease, background 0.15s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .input-shell:focus-within {
@@ -1062,7 +1079,7 @@ ul {
   font-size: 0.95rem;
   font-weight: 700;
   box-shadow: var(--shadow-glow);
-  transition: transform 0.12s ease, filter 0.15s ease;
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .primary-btn:hover {
@@ -1117,6 +1134,7 @@ ul {
   border-radius: 16px;
   padding: 15px;
   box-shadow: var(--shadow-card);
+  transition: all var(--dur-ios) var(--ease-ios);
 }
 
 .summary-card.is-best {
