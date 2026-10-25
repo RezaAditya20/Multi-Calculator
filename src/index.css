@@ -478,8 +478,8 @@ ul {
 
 @media (display-mode: standalone) {
   .mobile-dock {
-    /* Permintaan: saat standalone pill menempel 0px di tepi bawah layar */
-    padding-bottom: 0;
+    /* Persis Notes PWA: pill duduk di home-indicator area, ±34px dari tepi */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 
