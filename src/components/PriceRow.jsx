@@ -22,23 +22,6 @@ export default function PriceRow({
 
   return (
     <li className={`row-card${isBest ? " is-best" : ""}`}>
-      <div className="row-top">
-        <span className="row-index">{index + 1}</span>
-        {badge ? (
-          <span className={`badge badge-${badge.tone}`}>{badge.text}</span>
-        ) : null}
-        <button
-          type="button"
-          className="icon-btn"
-          onClick={onRemove}
-          aria-label={`Hapus item ${index + 1}`}
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M6 6l12 12M18 6L6 18" />
-          </svg>
-        </button>
-      </div>
-
       <div className="row-grid">
         <label className="field field-price">
           <span className="field-label">Harga</span>
@@ -84,11 +67,27 @@ export default function PriceRow({
           =
         </span>
 
-        <p className="result" aria-live="polite">
-          <span className="result-value">
-            {perMl === null ? "—" : `Rp ${formatPerMl(perMl)}`}
+        <p className="result">
+          <span className="row-index">{index + 1}</span>
+          <span className="result-main" aria-live="polite">
+            <span className="result-value">
+              {perMl === null ? "—" : `Rp ${formatPerMl(perMl)}`}
+            </span>
+            <span className="result-unit">/ml</span>
           </span>
-          <span className="result-unit">/ml</span>
+          {badge ? (
+            <span className={`badge badge-${badge.tone}`}>{badge.text}</span>
+          ) : null}
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={onRemove}
+            aria-label={`Hapus item ${index + 1}`}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
         </p>
       </div>
 
@@ -99,7 +98,7 @@ export default function PriceRow({
             ? "Termurah di antara yang lain"
             : overAmount !== null
               ? `Rp ${formatPerMl(overAmount)} lebih mahal per ml dari termurah`
-              : "Harga per mililiter"}
+              : "Harga per satuan"}
       </p>
     </li>
   );

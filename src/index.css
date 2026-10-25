@@ -386,12 +386,12 @@ ul {
 /* ── Hero ── */
 .hero {
   text-align: center;
-  padding: 26px 4px 22px;
+  padding: 16px 4px 14px;
 }
 
 .hero h1 {
-  margin: 0 0 10px;
-  font-size: clamp(1.75rem, 7vw, 2.75rem);
+  margin: 0 0 8px;
+  font-size: clamp(1.5rem, 6.4vw, 2.75rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
@@ -480,13 +480,13 @@ ul {
 /* ── Rows ── */
 .rows {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .row-card {
   background: var(--panel);
   border-radius: 16px;
-  padding: 14px;
+  padding: 12px;
   box-shadow: var(--shadow-card);
   transition: box-shadow 0.18s ease, background 0.18s ease;
 }
@@ -500,20 +500,13 @@ ul {
   box-shadow: var(--shadow-card), var(--shadow-glow);
 }
 
-.row-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
 .row-index {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--panel-soft);
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -528,12 +521,13 @@ ul {
 }
 
 .badge {
-  padding: 4px 9px;
+  padding: 3px 8px;
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.03em;
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 .badge-green {
@@ -547,9 +541,8 @@ ul {
 }
 
 .icon-btn {
-  margin-left: auto;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -558,6 +551,7 @@ ul {
   border-radius: 50%;
   background: var(--chip);
   color: var(--muted);
+  flex-shrink: 0;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
@@ -579,11 +573,11 @@ ul {
 /* ── Row grid: [harga] ÷ [ml] = [hasil] ── */
 .row-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr);
   grid-template-areas:
     "price divide ml"
     "result result result";
-  gap: 12px 4px;
+  gap: 10px 6px;
   align-items: end;
 }
 
@@ -607,9 +601,8 @@ ul {
   align-self: center;
   text-align: center;
   color: var(--muted);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  padding-bottom: 11px;
 }
 
 .field {
@@ -617,8 +610,10 @@ ul {
   min-width: 0;
 }
 
+/* Labels are hidden on mobile: the "Rp" / "ml" affixes already explain
+   both inputs, which keeps each card short. */
 .field-label {
-  display: block;
+  display: none;
   margin-bottom: 6px;
   font-size: 0.68rem;
   font-weight: 800;
@@ -633,7 +628,7 @@ ul {
   gap: 6px;
   min-width: 0;
   padding: 0 12px;
-  height: 48px;
+  height: 42px;
   border-radius: 12px;
   background: var(--field);
   transition: box-shadow 0.15s ease, background 0.15s ease;
@@ -672,13 +667,14 @@ ul {
   flex-shrink: 0;
 }
 
+/* Result bar: index + price + badge + delete in a single compact line. */
 .result {
   grid-area: result;
   margin: 0;
   display: flex;
-  align-items: baseline;
-  gap: 6px;
-  padding: 13px 14px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 5px 5px 8px;
   border-radius: 12px;
   background: var(--panel-soft);
   min-width: 0;
@@ -688,12 +684,22 @@ ul {
   background: var(--primary-soft);
 }
 
+.result-main {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
 .result-value {
-  font-size: clamp(1.35rem, 6vw, 1.7rem);
+  font-size: clamp(1.2rem, 5vw, 1.7rem);
+  line-height: 1.15;
   font-weight: 800;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
   color: var(--fg);
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -704,21 +710,18 @@ ul {
 }
 
 .result-unit {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--muted);
   flex-shrink: 0;
 }
 
 .row-hint {
+  display: none;
   margin: 10px 0 0;
   font-size: 0.76rem;
   line-height: 1.4;
   color: var(--muted);
-}
-
-.row-hint + .row-hint {
-  margin-top: 4px;
 }
 
 /* ── Buttons ── */
@@ -860,14 +863,34 @@ ul {
     padding: 34px 4px 26px;
   }
 
+  .rows {
+    gap: 14px;
+  }
+
   .row-card {
     padding: 16px;
   }
 
+  .field-label {
+    display: block;
+  }
+
+  .op {
+    padding-bottom: 11px;
+  }
+
+  .input-shell {
+    height: 46px;
+  }
+
+  .row-hint {
+    display: block;
+  }
+
   .row-grid {
     grid-template-columns:
-      minmax(0, 1.25fr) 26px minmax(0, 0.85fr) 26px
-      minmax(0, 1.15fr);
+      minmax(0, 1.1fr) 26px minmax(0, 0.75fr) 26px
+      minmax(0, 1.7fr);
     grid-template-areas: "price divide ml equals result";
     gap: 12px 8px;
   }
@@ -875,10 +898,6 @@ ul {
   .op-equals {
     display: block;
     grid-area: equals;
-  }
-
-  .result {
-    justify-content: flex-end;
   }
 }
 
