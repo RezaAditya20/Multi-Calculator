@@ -1,6 +1,6 @@
 /* Offline shell for the Unit Prices PWA.
    Bump CACHE_VERSION whenever cached assets change. */
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_NAME = `multi-calculator-${CACHE_VERSION}`;
 
 /* All URLs are relative to this worker's location, so the app works both at
@@ -38,7 +38,9 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-/* Network first, fall back to cache so the app keeps working offline. */
+/* Network first, fall back to cache so the app keeps working offline.
+   `cache: "no-cache"` bypasses the HTTP cache so a deploy (new CSS/JS hashes)
+   is always picked up on the next launch instead of a stale copy. */
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
@@ -47,7 +49,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   event.respondWith(
-    fetch(request)
+    fetch(request, { cache: "no-cache" })
       .then((response) => {
         if (response && response.ok) {
           const copy = response.clone();
