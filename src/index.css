@@ -63,11 +63,16 @@
 
 html {
   background: var(--bg);
+  /* iOS rubber-band on a page with no real scroll room can leave scrollY stuck
+     negative; a fixed element then reports rect = innerHeight - scrollY, which
+     drags the bottom dock below the screen (input "sinks"). Block it. */
+  overscroll-behavior: none;
 }
 
 body {
   margin: 0;
   background: var(--bg);
+  overscroll-behavior: none;
   color: var(--fg);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
@@ -98,6 +103,13 @@ ul {
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Same as Meal-Planner: keep the document taller than the layout viewport so
+   scrolling is always a real scroll (scrollY stays valid) instead of an
+   overscroll bounce that destabilises position:fixed children. */
+.app {
+  min-height: 100vh;
 }
 
 /* ── Topbar: transparan di mobile + pil kaca mengambang (persis Notes) ── */
