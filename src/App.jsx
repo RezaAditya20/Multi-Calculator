@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import PriceRow from "./components/PriceRow.jsx";
-import { formatPerMl, pricePerMl } from "./lib/format.js";
+import { formatPerMl, pricePerMl, sanitizeDecimal } from "./lib/format.js";
 
 const STORAGE_KEY = "multi-calculator.tabs.v1";
 const LEGACY_KEYS = [
@@ -8,7 +8,6 @@ const LEGACY_KEYS = [
   "multi-calculator.soap.v1",
 ];
 const THEME_KEY = "multi-calculator.theme";
-const SIZE_PRESETS = [50, 100, 250, 500, 800, 1000];
 
 function uid() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -85,6 +84,7 @@ export default function App() {
   const [{ tabs, activeTabId }, setState] = useState(readState);
   const [editingTabId, setEditingTabId] = useState(null);
   const [draftName, setDraftName] = useState("");
+  const [quickSize, setQuickSize] = useState("");
   const [theme, setTheme] = useState(() => {
     try {
       return window.localStorage.getItem(THEME_KEY) || "dark";
@@ -213,9 +213,16 @@ export default function App() {
 
   const addRow = (ml = "") => {
     if (!activeTab) return;
+    const size = ml ? sanitizeDecimal(String(ml)) : "";
     patchTab(activeTab.id, {
-      rows: [...activeTab.rows, makeRow("", ml ? String(ml) : "")],
+      rows: [...activeTab.rows, makeRow("", size)],
     });
+  };
+
+  const addRowFromSizeInput = (event) => {
+    if (event) event.preventDefault();
+    addRow(quickSize);
+    setQuickSize("");
   };
 
   const removeRow = (rowId) => {
@@ -250,7 +257,10 @@ export default function App() {
               </svg>
             </span>
             <span className="brand-text">
-              <span className="brand-name">unitprices</span>
+              <span className="brand-name">
+                <span className="brand-accent">U</span>nit
+                <span className="brand-accent">P</span>rices
+              </span>
               <span className="brand-tag">Bandingkan harga satuan</span>
             </span>
           </a>
@@ -370,27 +380,29 @@ export default function App() {
             Masukkan harga dan jumlah kemasannya (ml, gram, pcs), langsung
             terlihat mana yang paling hemat.
           </p>
-          <p className="hero-meta">
-            Gratis <span className="dot">•</span> Tanpa akun
-            <span className="dot">•</span> Tersimpan otomatis
-          </p>
         </section>
 
-        <div className="stripe" role="group" aria-label="Tambah ukuran cepat">
-          <span className="stripe-label">Tambah ukuran</span>
-          <div className="stripe-scroll no-scrollbar">
-            {SIZE_PRESETS.map((size) => (
-              <button
-                key={size}
-                type="button"
-                className="chip"
-                onClick={() => addRow(size)}
-              >
-                + {size} ml
-              </button>
-            ))}
-          </div>
-        </div>
+        <form className="quick-add" onSubmit={addRowFromSizeInput}>
+          <span className="quick-label">Tambah ukuran</span>
+          <span className="input-shell quick-field">
+            <input
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
+              placeholder="100"
+              aria-label="Ukuran baru dalam ml"
+              value={quickSize}
+              onChange={(event) => setQuickSize(sanitizeDecimal(event.target.value))}
+            />
+            <span className="affix affix-end">ml</span>
+          </span>
+          <button type="submit" className="quick-btn">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Tambah
+          </button>
+        </form>
 
         {items.length === 0 ? (
           <div className="empty">
@@ -429,16 +441,18 @@ export default function App() {
           </ul>
         )}
 
-        <button
-          type="button"
-          className="primary-btn add-btn"
-          onClick={() => addRow()}
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          Tambah item
-        </button>
+        <div className="add-dock">
+          <button
+            type="button"
+            className="primary-btn add-btn"
+            onClick={() => addRow()}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Tambah item
+          </button>
+        </div>
 
         {comparedCount > 1 && best && worst ? (
           <section className="summary" aria-label="Ringkasan perbandingan">

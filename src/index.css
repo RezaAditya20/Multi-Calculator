@@ -164,6 +164,10 @@ ul {
   line-height: 1.1;
 }
 
+.brand-accent {
+  color: var(--primary);
+}
+
 .brand-tag {
   font-size: 0.68rem;
   line-height: 1.2;
@@ -380,7 +384,7 @@ ul {
 .page {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 44px);
+  padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 96px);
 }
 
 /* ── Hero ── */
@@ -405,76 +409,84 @@ ul {
 }
 
 .hero-desc {
-  margin: 0 auto 10px;
+  margin: 0 auto;
   max-width: 34rem;
   font-size: clamp(0.95rem, 3.4vw, 1.1rem);
   line-height: 1.5;
   color: var(--fg-dim);
 }
 
-.hero-meta {
-  margin: 0;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.hero-meta .dot {
-  margin: 0 7px;
-  opacity: 0.6;
-}
-
-/* ── Size preset stripe ── */
-.stripe {
+/* ── Quick add (size input) ── */
+.quick-add {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  padding: 10px 12px;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 8px;
   border-radius: 14px;
   background: var(--panel);
   box-shadow: var(--shadow-card);
 }
 
-.stripe-label {
+.quick-label {
   flex-shrink: 0;
   font-size: 0.7rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
+  white-space: nowrap;
 }
 
-.stripe-scroll {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 2px;
-  margin: -2px;
-  -webkit-overflow-scrolling: touch;
+.quick-field {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
 }
 
-.chip {
+.quick-field input {
+  font-size: 0.95rem;
+}
+
+.quick-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   flex-shrink: 0;
-  height: 32px;
-  padding: 0 13px;
+  height: 38px;
+  padding: 0 14px;
   border: 0;
-  border-radius: 999px;
-  background: var(--chip);
-  color: var(--fg-dim);
-  font-size: 0.8rem;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.85rem;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+  transition: background 0.15s ease, transform 0.12s ease;
 }
 
-.chip:hover {
-  background: var(--primary-soft);
-  color: var(--primary);
+.quick-btn:hover,
+.quick-btn:active {
+  background: var(--primary-strong);
 }
 
-.chip:active {
-  transform: scale(0.96);
+.quick-btn:active {
+  transform: translateY(1px);
+}
+
+.quick-btn svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.quick-add:focus-within {
+  box-shadow: var(--shadow-card), 0 0 0 3px var(--focus-ring);
 }
 
 /* ── Rows ── */
@@ -759,6 +771,24 @@ ul {
   stroke-linecap: round;
 }
 
+/* Sticky bottom dock for the add button (mobile only). */
+.add-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  padding: 10px 16px calc(env(safe-area-inset-bottom, 0px) + 10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.28);
+}
+
+.add-dock .add-btn {
+  margin-top: 0;
+}
+
 .add-btn {
   margin-top: 14px;
 }
@@ -843,7 +873,7 @@ ul {
 }
 
 /* ── Focus ── */
-.chip:focus-visible,
+.quick-btn:focus-visible,
 .primary-btn:focus-visible,
 .ghost-btn:focus-visible,
 .icon-btn:focus-visible,
@@ -857,6 +887,16 @@ ul {
 @media (min-width: 760px) {
   .page {
     padding-top: 14px;
+    padding-bottom: 44px;
+  }
+
+  .add-dock {
+    position: static;
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
   }
 
   .hero {
