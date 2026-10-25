@@ -116,67 +116,6 @@ export default function App() {
     );
   }, [theme]);
 
-  // TEMP DIAGNOSTIC: report the dock geometry actually used on device so the
-  // bottom gap can be compared against the reference app. Remove after debugging.
-  const [dockProbe, setDockProbe] = useState(null);
-
-  useEffect(() => {
-    let frame = 0;
-
-    const measure = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        try {
-          const probe = document.createElement("div");
-          probe.style.cssText =
-            "position:absolute;top:0;left:0;height:env(safe-area-inset-bottom);visibility:hidden";
-          document.body.appendChild(probe);
-          const envBottom = Math.round(probe.getBoundingClientRect().height);
-          probe.remove();
-
-          const dock = document.querySelector(".mobile-dock");
-          if (!dock) return;
-          const pill = document.querySelector(".mobile-dock-search");
-          const dockRect = dock.getBoundingClientRect();
-          const style = window.getComputedStyle(dock);
-          const parent = dock.parentElement;
-          setDockProbe({
-            mode: window.matchMedia("(display-mode: standalone)").matches
-              ? "standalone"
-              : "browser",
-            env: envBottom,
-            pad: Math.round(parseFloat(style.paddingBottom) || 0),
-            pos: style.position,
-            parent: parent ? parent.className || parent.tagName : "?",
-            offsetParent: dock.offsetParent
-              ? dock.offsetParent.className || dock.offsetParent.tagName
-              : "null",
-            rectBottom: Math.round(dockRect.bottom),
-            pillBottom: pill ? Math.round(pill.getBoundingClientRect().bottom) : 0,
-            scrollY: Math.round(window.scrollY),
-            innerH: Math.round(window.innerHeight),
-            innerW: Math.round(window.innerWidth),
-            clientW: document.documentElement.clientWidth,
-            scrollH: document.documentElement.scrollHeight,
-            screenH: window.screen ? window.screen.height : 0,
-            scale: window.visualViewport ? window.visualViewport.scale : 0,
-          });
-        } catch (error) {
-          console.warn("probe failed:", error);
-        }
-      });
-    };
-
-    measure();
-    window.addEventListener("resize", measure);
-    window.addEventListener("scroll", measure, { passive: true });
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("resize", measure);
-      window.removeEventListener("scroll", measure);
-    };
-  }, []);
-
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
   const rows = activeTab ? activeTab.rows : [];
 
@@ -560,18 +499,6 @@ export default function App() {
           Data tersimpan di perangkat ini, jadi bisa dicek lagi kapan saja.
         </p>
 
-        {dockProbe ? (
-          <p className="foot-note foot-debug">
-            DEBUG {dockProbe.mode} pos:{dockProbe.pos} op:{dockProbe.offsetParent} parent:
-            {dockProbe.parent}
-            <br />
-            env:{dockProbe.env} pad:{dockProbe.pad} rect:{dockProbe.rectBottom} pill:
-            {dockProbe.pillBottom} scrollY:{dockProbe.scrollY}
-            <br />
-            inner:{dockProbe.innerW}x{dockProbe.innerH} clientW:{dockProbe.clientW} scrollH:
-            {dockProbe.scrollH} screenH:{dockProbe.screenH} scale:{dockProbe.scale}
-          </p>
-        ) : null}
       </main>
 
       {/* Dock bawah mobile: input ukuran + tombol bulat (persis Notes) */}

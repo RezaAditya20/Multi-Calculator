@@ -503,6 +503,7 @@ ul {
   gap: 10px;
   height: 44px;
   padding: 0 16px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   border-radius: 999px;
   background: color-mix(in srgb, var(--fg) 12%, transparent);
   backdrop-filter: blur(20px);
@@ -1212,15 +1213,6 @@ ul {
   text-align: center;
   font-size: 0.78rem;
   color: var(--muted);
-}
-
-/* TEMP DIAGNOSTIC: on-device dock geometry readout (remove after debugging). */
-.foot-debug {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.66rem;
-  line-height: 1.7;
-  color: var(--fg-dim);
-  word-break: break-word;
 }
 
 /* ── Focus ── */
