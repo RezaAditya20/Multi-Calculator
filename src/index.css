@@ -17,6 +17,7 @@
   --red-soft: rgba(248, 113, 113, 0.14);
   --chip: rgba(255, 255, 255, 0.08);
   --chip-hover: rgba(255, 255, 255, 0.14);
+  --border: rgba(255, 255, 255, 0.14);
   --header-bg: #0b0b0c;
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 60px rgba(59, 130, 246, 0.18);
@@ -43,6 +44,7 @@
   --red-soft: rgba(220, 38, 38, 0.1);
   --chip: rgba(15, 23, 42, 0.06);
   --chip-hover: rgba(15, 23, 42, 0.11);
+  --border: rgba(15, 23, 42, 0.12);
   --header-bg: #ffffff;
   --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06);
   --shadow-glow: 0 0 60px rgba(37, 99, 235, 0.18);
@@ -94,16 +96,16 @@ ul {
   display: none;
 }
 
-/* ── Topbar: sticky + blur yang menutup safe area atas ── */
+/* ── Topbar: transparan di mobile + pil kaca mengambang (persis Notes) ── */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 30;
-  padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px;
-  background: color-mix(in srgb, var(--header-bg) 86%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-header);
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 6px;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
 
 .topbar-inner {
@@ -112,43 +114,65 @@ ul {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-width: 0;
   min-height: 40px;
-  padding: 4px 6px;
-  border-radius: 10px;
-  transition: opacity 0.15s ease;
 }
 
-.brand:active {
-  opacity: 0.8;
-}
-
-.brand-mark {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  background: linear-gradient(140deg, var(--primary) 0%, var(--primary-strong) 100%);
-  box-shadow: var(--shadow-glow);
+/* Logo = pil kaca mengambang di pojok kiri atas (mirip .menu-toggle Notes) */
+.brand {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  left: calc(env(safe-area-inset-left, 0px) + 16px);
+  z-index: 360;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fg) 12%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--fg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: transform 0.12s ease;
+}
+
+.brand:active {
+  transform: scale(0.94);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: none;
+  box-shadow: none;
   flex-shrink: 0;
 }
 
 .brand-mark svg {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
   fill: none;
-  stroke: #fff;
+  stroke: var(--primary);
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* Judul digeser 3rem agar tidak tertimpa pil yang position: fixed */
+.topbar-title-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding-left: 3rem;
 }
 
 .brand-text {
@@ -162,6 +186,9 @@ ul {
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .brand-accent {
@@ -244,7 +271,7 @@ ul {
 
 @media (display-mode: standalone) {
   .topbar {
-    padding-top: calc(env(safe-area-inset-top, 47px) + 12px);
+    padding-top: calc(env(safe-area-inset-top, 47px) + 14px);
   }
 }
 
@@ -416,6 +443,282 @@ ul {
   color: var(--fg-dim);
 }
 
+/* ── Bottom dock (persis gaya mobile-dock di project Notes) ── */
+.mobile-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 300;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 0 16px;
+  padding-left: calc(env(safe-area-inset-left, 0px) + 16px);
+  padding-right: calc(env(safe-area-inset-right, 0px) + 16px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+@media (display-mode: standalone) {
+  .mobile-dock {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+.mobile-dock-search {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fg) 12%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transition: box-shadow 0.15s ease;
+}
+
+.mobile-dock-search:focus-within {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px var(--focus-ring);
+}
+
+.mobile-dock-search svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--muted);
+}
+
+.mobile-dock-search input {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+
+.mobile-dock-search input::placeholder {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.mobile-dock-add {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transition: transform 0.12s ease;
+}
+
+.mobile-dock-add svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.mobile-dock-add:active {
+  transform: scale(0.94);
+}
+
+/* Di mobile, "tambah ukuran" pindah ke dock: form di body & tombol penuh
+   dihilangkan agar hemat tempat. */
+@media (max-width: 759px) {
+  .add-dock {
+    display: none;
+  }
+
+  /* subtitle hero tidak ditampilkan di mobile agar hemat tempat */
+  .hero-desc {
+    display: none;
+  }
+
+  /* fade kaca di atas, menutup konten yang lewat di balik topbar transparan */
+  .app::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 110px;
+    z-index: 15;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg) 30%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 30%, transparent) 50%,
+      transparent 100%
+    );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+  }
+
+  @media (display-mode: standalone) {
+    .app::before {
+      height: 150px;
+    }
+  }
+
+  /* aksi topbar dikelompokkan jadi satu pil kaca (persis Notes) */
+  .topbar-actions {
+    gap: 3px;
+    padding: 3px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--fg) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .topbar-actions .count-pill {
+    padding: 0 7px;
+    background: transparent;
+    color: var(--fg-dim);
+  }
+
+  .topbar-actions .topbar-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--fg);
+  }
+
+  .topbar-actions .topbar-btn:hover,
+  .topbar-actions .topbar-btn:active {
+    background: color-mix(in srgb, var(--fg) 8%, transparent);
+  }
+
+  .topbar-actions .ghost-btn {
+    padding: 0 9px;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--fg);
+  }
+
+  .topbar-actions .ghost-btn:hover,
+  .topbar-actions .ghost-btn:active {
+    background: color-mix(in srgb, var(--fg) 8%, transparent);
+  }
+
+  /* fade kaca di balik dock, sama seperti Notes */
+  .app::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 110px;
+    z-index: 15;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--bg) 30%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 30%, transparent) 50%,
+      transparent 100%
+    );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    -webkit-mask-image: linear-gradient(to top, #000 40%, transparent 100%);
+    mask-image: linear-gradient(to top, #000 40%, transparent 100%);
+  }
+
+  @media (display-mode: standalone) {
+    .app::after {
+      height: 150px;
+    }
+  }
+}
+
+@media (min-width: 760px) {
+  .mobile-dock {
+    display: none;
+  }
+
+  /* Desktop: topbar kembali berlatar blur, pil logo mengalir di alur normal */
+  .topbar {
+    padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px;
+    background: color-mix(in srgb, var(--header-bg) 86%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-header);
+  }
+
+  .topbar-inner {
+    min-height: 0;
+  }
+
+  .brand {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 4px 6px;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    color: inherit;
+    box-shadow: none;
+  }
+
+  .brand:active {
+    transform: none;
+    opacity: 0.8;
+  }
+
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: linear-gradient(
+      140deg,
+      var(--primary) 0%,
+      var(--primary-strong) 100%
+    );
+    box-shadow: var(--shadow-glow);
+  }
+
+  .brand-mark svg {
+    width: 17px;
+    height: 17px;
+    stroke: #ffffff;
+  }
+
+  .topbar-title-wrap {
+    min-height: 0;
+    padding-left: 0;
+  }
+}
+
 /* ── Quick add (size input) ── */
 .quick-add {
   display: flex;
@@ -487,6 +790,14 @@ ul {
 
 .quick-add:focus-within {
   box-shadow: var(--shadow-card), 0 0 0 3px var(--focus-ring);
+}
+
+/* Di mobile form ini diganti dock bawah (lihat .mobile-dock).
+   Harus didefinisikan SETELAH .quick-add base agar tidak tertimpa. */
+@media (max-width: 759px) {
+  .quick-add {
+    display: none;
+  }
 }
 
 /* ── Rows ── */

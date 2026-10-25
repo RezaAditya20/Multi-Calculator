@@ -244,11 +244,13 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="topbar-inner">
+          {/* Pil kaca mengambang di pojok kiri atas (persis .menu-toggle di Notes) */}
           <a
             className="brand"
             href="./"
             onClick={(event) => event.preventDefault()}
             aria-label="Beranda"
+            title="UnitPrices"
           >
             <span className="brand-mark" aria-hidden="true">
               <svg viewBox="0 0 24 24">
@@ -256,6 +258,9 @@ export default function App() {
                 <path d="M9.6 13.6h4.8M10.9 11.9l-.7 1.7m3.6-1.7.7 1.7" />
               </svg>
             </span>
+          </a>
+
+          <div className="topbar-title-wrap">
             <span className="brand-text">
               <span className="brand-name">
                 <span className="brand-accent">U</span>nit
@@ -263,7 +268,7 @@ export default function App() {
               </span>
               <span className="brand-tag">Bandingkan harga satuan</span>
             </span>
-          </a>
+          </div>
 
           <div className="topbar-actions">
             <span className="count-pill">{items.length} item</span>
@@ -494,6 +499,35 @@ export default function App() {
           Data tersimpan di perangkat ini, jadi bisa dicek lagi kapan saja.
         </p>
       </main>
+
+      {/* Dock bawah mobile: input ukuran + tombol bulat (persis Notes) */}
+      <div className="mobile-dock">
+        <form className="mobile-dock-search" onSubmit={addRowFromSizeInput}>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3.2c0 0 6.4 6.1 6.4 10.4A6.4 6.4 0 0 1 12 20a6.4 6.4 0 0 1-6.4-6.4C5.6 9.3 12 3.2 12 3.2Z" />
+          </svg>
+          <input
+            type="text"
+            inputMode="decimal"
+            autoComplete="off"
+            placeholder="Ukuran (ml)"
+            aria-label="Ukuran baru dalam ml"
+            value={quickSize}
+            onChange={(event) => setQuickSize(sanitizeDecimal(event.target.value))}
+          />
+        </form>
+        <button
+          type="button"
+          className="mobile-dock-add"
+          onClick={() => addRowFromSizeInput()}
+          aria-label="Tambah item"
+          title="Tambah item"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
