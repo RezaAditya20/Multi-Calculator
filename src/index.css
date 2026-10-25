@@ -1202,6 +1202,15 @@ ul {
   color: var(--muted);
 }
 
+/* TEMP DIAGNOSTIC: on-device dock geometry readout (remove after debugging). */
+.foot-debug {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.66rem;
+  line-height: 1.7;
+  color: var(--fg-dim);
+  word-break: break-word;
+}
+
 /* ── Focus ── */
 .quick-btn:focus-visible,
 .primary-btn:focus-visible,

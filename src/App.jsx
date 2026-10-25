@@ -116,6 +116,46 @@ export default function App() {
     );
   }, [theme]);
 
+  // TEMP DIAGNOSTIC: report the dock geometry actually used on device so the
+  // bottom gap can be compared against the reference app. Remove after debugging.
+  const [dockProbe, setDockProbe] = useState(null);
+
+  useEffect(() => {
+    const measure = () => {
+      try {
+        const probe = document.createElement("div");
+        probe.style.cssText =
+          "position:absolute;top:0;left:0;height:env(safe-area-inset-bottom);visibility:hidden";
+        document.body.appendChild(probe);
+        const envBottom = Math.round(probe.getBoundingClientRect().height);
+        probe.remove();
+
+        const dock = document.querySelector(".mobile-dock");
+        if (!dock) return;
+        const pill = document.querySelector(".mobile-dock-search");
+        const dockRect = dock.getBoundingClientRect();
+        setDockProbe({
+          mode: window.matchMedia("(display-mode: standalone)").matches
+            ? "standalone"
+            : "browser",
+          env: envBottom,
+          pad: Math.round(parseFloat(getComputedStyle(dock).paddingBottom) || 0),
+          dockBottom: Math.round(dockRect.bottom),
+          pillBottom: pill ? Math.round(pill.getBoundingClientRect().bottom) : 0,
+          inner: Math.round(window.innerHeight),
+          vv: window.visualViewport ? Math.round(window.visualViewport.height) : 0,
+          dpr: window.devicePixelRatio,
+        });
+      } catch (error) {
+        console.warn("probe failed:", error);
+      }
+    };
+
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
   const rows = activeTab ? activeTab.rows : [];
 
@@ -498,6 +538,14 @@ export default function App() {
         <p className="foot-note">
           Data tersimpan di perangkat ini, jadi bisa dicek lagi kapan saja.
         </p>
+
+        {dockProbe ? (
+          <p className="foot-note foot-debug">
+            DEBUG mode:{dockProbe.mode} env:{dockProbe.env} pad:{dockProbe.pad} pillBottom:
+            {dockProbe.pillBottom} dockBottom:{dockProbe.dockBottom} innerH:{dockProbe.inner} vv:
+            {dockProbe.vv} dpr:{dockProbe.dpr}
+          </p>
+        ) : null}
       </main>
 
       {/* Dock bawah mobile: input ukuran + tombol bulat (persis Notes) */}
